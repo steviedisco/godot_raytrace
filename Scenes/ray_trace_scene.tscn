@@ -12,4 +12,5 @@ func _process(delta):
 [node name="RayTrace_Scene" type="Node3D"]
 
 [node name="CameraRayTest" type="Camera3D" parent="."]
+near = 0.7
 script = SubResource("GDScript_w2v1f")
