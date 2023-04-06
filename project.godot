@@ -11,5 +11,10 @@ config_version=5
 [application]
 
 config/name="Godot Raytrace"
+run/main_scene="res://Scenes/ray_trace_scene.tscn"
 config/features=PackedStringArray("4.0", "Forward Plus")
 config/icon="res://icon.svg"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/camera_ray_test/plugin.cfg")
