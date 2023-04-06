@@ -1,16 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://dwo7hjlt8kqph"]
-
-[sub_resource type="GDScript" id="GDScript_w2v1f"]
-script/source = "extends Camera3D
-
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta):
-	pass
-"
+[gd_scene format=3 uid="uid://dwo7hjlt8kqph"]
 
 [node name="RayTrace_Scene" type="Node3D"]
 
 [node name="CameraRayTest" type="Camera3D" parent="."]
-near = 0.7
-script = SubResource("GDScript_w2v1f")
+current = true
+near = 0.8
