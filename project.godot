@@ -15,6 +15,11 @@ run/main_scene="res://Scenes/ray_trace_scene.tscn"
 config/features=PackedStringArray("4.0", "Forward Plus")
 config/icon="res://icon.svg"
 
+[display]
+
+window/size/viewport_width=1600
+window/size/viewport_height=900
+
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/camera_ray_test/plugin.cfg")
+enabled=PackedStringArray("res://addons/camera_ray_test/plugin.cfg", "res://addons/camera_preview/plugin.cfg")

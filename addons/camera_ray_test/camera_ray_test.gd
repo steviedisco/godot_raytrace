@@ -3,15 +3,17 @@ extends EditorPlugin
 
 var camera_changed_handler = null
 
+
 func _enter_tree():
 	camera_changed_handler = CameraChangedHandler.new()
+	camera_changed_handler.plugin = self
 	add_child(camera_changed_handler)
+	
 
 func _exit_tree():
 	remove_child(camera_changed_handler)
 	camera_changed_handler.queue_free()
-
-
+	
 
 class CameraChangedHandler:
 	extends Node	
@@ -25,8 +27,12 @@ class CameraChangedHandler:
 	var previous_fovs = {}
 	var previous_nears = {}
 	var previous_currents = {}
+	
+	var plugin
+	var last_scene
+	var current_scene
 
-	const debug_point_count_x = 9
+	const debug_point_count_x = 16
 	const debug_point_count_y = 9	
 	
 	var points = []
@@ -49,10 +55,24 @@ class CameraChangedHandler:
 			set_process(true)
 
 
-	func _process(delta):
+	func _process(delta):		
+		var editor = plugin.get_editor_interface()
+		
+		if editor.get_edited_scene_root():
+			current_scene = editor.get_edited_scene_root().get_path().hash()
+		else:
+			current_scene = 0			
+
+		if last_scene and current_scene != last_scene:
+			print ('scene changed')
+			clear_points()
+			reset_handler()
+
+		last_scene = current_scene
+		
 		for camera in monitored_cameras.keys():
 						
-			if camera and camera is Camera3D:
+			if camera and camera is Camera3D and camera.name == 'CameraRayTest':
 				var current_transform = camera.global_transform
 				var current_fov = camera.fov
 				var current_near = camera.near
@@ -67,7 +87,7 @@ class CameraChangedHandler:
 					current_fov != previous_fov or 
 					current_near != previous_near or 
 					current != previous_current):
-						
+					
 					clear_points()	
 					
 					if (current):
@@ -108,10 +128,11 @@ class CameraChangedHandler:
 	
 	func draw_camera_points(cam: Camera3D):
 		var cam_t: Transform3D = cam.global_transform
+		var cam_near = cam.near + 0.05
 		
-		var plane_height: float = 2 * cam.near * tan(deg_to_rad(cam.fov) / 2);
-		var plane_width: float = plane_height * get_camera_aspect_ratio(cam)		
-		var bottom_left_local = Vector3(-plane_width / 2, -plane_height / 2, -cam.near)			
+		var plane_height: float = 2 * cam_near * tan(deg_to_rad(cam.fov) / 2);
+		var plane_width: float = plane_height * get_aspect_ratio()		
+		var bottom_left_local = Vector3(-plane_width / 2, -plane_height / 2, -cam_near)			
 		
 		for x in range(debug_point_count_x):
 			for y in range(debug_point_count_y):				
@@ -145,12 +166,20 @@ class CameraChangedHandler:
 		return mesh_instance
 		
 		
-	func get_camera_aspect_ratio(cam: Camera3D):
-		var viewport = cam.get_viewport()
-		var viewport_size = viewport.size
-		return viewport_size.x / viewport_size.y
+	func get_aspect_ratio():		
+		var window_size = DisplayServer.window_get_size()
+		return float(window_size.x) / float(window_size.y)
 		
 		
 	func clear_points():
 		for child in points_node.get_children():
 			child.visible = false
+			
+			
+	func reset_handler():
+		for camera in monitored_cameras:					
+			if camera and camera is Camera3D:
+				previous_transforms[camera] = camera.global_transform
+				previous_fovs[camera] = camera.fov
+				previous_nears[camera] = camera.near
+				previous_currents[camera] = false
