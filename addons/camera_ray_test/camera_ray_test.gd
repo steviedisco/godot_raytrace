@@ -32,8 +32,8 @@ class CameraChangedHandler:
 	var last_scene
 	var current_scene
 
-	const debug_point_count_x = 16
-	const debug_point_count_y = 9	
+	const debug_point_count_x = 7
+	const debug_point_count_y = 5	
 	
 	var points = []
 	
@@ -64,7 +64,6 @@ class CameraChangedHandler:
 			current_scene = 0			
 
 		if last_scene and current_scene != last_scene:
-			print ('scene changed')
 			clear_points()
 			reset_handler()
 
@@ -90,13 +89,16 @@ class CameraChangedHandler:
 					
 					clear_points()	
 					
-					if (current):
+					if current:
 						draw_camera_points(camera)
 					
 					previous_transforms[camera] = current_transform
 					previous_fovs[camera] = current_fov
 					previous_nears[camera] = current_near
 					previous_currents[camera] = current
+				
+				if current:
+					draw_debug_arrows(camera)
 
 
 	func _on_node_removed(node):
@@ -141,10 +143,22 @@ class CameraChangedHandler:
 				
 				var point_local: Vector3 = bottom_left_local + Vector3(plane_width * tx, plane_height * ty, 0)
 				var point: Vector3 = cam_t.origin + cam_t.basis.x * point_local.x + cam_t.basis.y * point_local.y + cam_t.basis.z * point_local.z
+				var dir: Vector3 = (point - cam_t.origin).normalized()
 		
 				points[x][y].transform.origin = point
 				points[x][y].visible = true
 				
+				
+	func draw_debug_arrows(cam: Camera3D):
+		var cam_t: Transform3D = cam.global_transform
+		
+		for x in range(debug_point_count_x):
+			for y in range(debug_point_count_y):				
+				var point: Vector3 = points[x][y].transform.origin
+				var dir: Vector3 = (point - cam_t.origin).normalized()			
+				var len = (point - cam_t.origin).length()
+				DebugDraw.draw_arrow_ray(cam_t.origin, dir, len, Color.AQUAMARINE, 0.05)
+		
 				
 	func point(pos: Vector3, radius = 0.025, color = Color.WHITE_SMOKE) -> MeshInstance3D:
 		var mesh_instance := MeshInstance3D.new()

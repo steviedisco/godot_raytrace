@@ -3,5 +3,6 @@
 [node name="RayTrace_Scene" type="Node3D"]
 
 [node name="CameraRayTest" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.232645)
 current = true
 near = 0.8
